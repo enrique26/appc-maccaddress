@@ -1,0 +1,22 @@
+%define lookup-function-name lookupGeneratedInit
+%define class-name MacaddressBindings
+%{
+
+#include <string.h>
+#include <v8.h>
+#include <KrollBindings.h>
+
+#include "com.ibilis.macaddress.ExampleProxy.h"
+#include "com.ibilis.macaddress.MacaddressModule.h"
+
+
+namespace titanium {
+namespace bindings {
+%}
+struct BindEntry;
+%%
+com.ibilis.macaddress.MacaddressModule,::com::ibilis::macaddress::MacaddressModule::bindProxy,::com::ibilis::macaddress::MacaddressModule::dispose
+com.ibilis.macaddress.ExampleProxy,::com::ibilis::macaddress::macaddress::ExampleProxy::bindProxy,::com::ibilis::macaddress::macaddress::ExampleProxy::dispose
+%%
+}
+}

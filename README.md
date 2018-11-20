@@ -10,27 +10,29 @@ El modulo se creo usando a la clase compartida por robin henniges:
 
 
 ## Instalacion del modulo
-Descarga el modulo.zip que se encuentra en la carpeta /dist del proyecto 
+Descarga el modulo.zip que se encuentra en la carpeta /android/dist del proyecto 
 
 
 ### Uso
 
 Agregar el modulo usando el IDE de appcelerator o bien extrayendo el contenido del .zip en la carpeta /modules/android/
 
-Agregando al tiapp la referencia del modulo:
+Edita la seccion <modules> en el tiapp.xml:
 ```
 <modules>
     <module platform="android">com.ibilis.macaddress</module>
 </modules>
 ```
 
-por ultimo agregar el siguiente permiso al manifest:
+Por ultimo agregar los siguientes permisos al manifest dentro del tiapp.xm:
+
 ```
 <uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 ```
 
 
-para obtener la mac address del dispositivo:
+Para obtener la mac address del dispositivo:
 
 ```
 //importar el modulo
