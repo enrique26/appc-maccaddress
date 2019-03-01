@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0
+apiversion: 4
+architectures: armeabi-v7a x86
+description: macaddress
+author: enrique (ibilis)
+license: Specify your license
+copyright: Copyright (c) 2018 by Your Company
+
+# these should not be edited
+name: macaddress
+moduleid: com.ibilis.macaddress
+guid: ba4e44b6-ddd6-4f14-a5cc-984ef1a56a2d
+platform: android
+minsdk: 7.1.0.GA

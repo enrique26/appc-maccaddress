@@ -18,7 +18,7 @@ namespace macaddress {
 class MacaddressModule : public titanium::Proxy
 {
 public:
-	explicit MacaddressModule(jobject javaObject);
+	explicit MacaddressModule();
 
 	static void bindProxy(v8::Local<v8::Object>, v8::Local<v8::Context>);
 	static v8::Local<v8::FunctionTemplate> getProxyTemplate(v8::Isolate*);

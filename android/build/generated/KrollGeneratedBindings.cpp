@@ -1,12 +1,12 @@
-/* C++ code produced by gperf version 3.0.3 */
-/* Command-line: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/gperf -L C++ -E -t /Users/Ragna/Documents/Appcelerator_Studio_Workspace/macaddress/android/build/generated/KrollGeneratedBindings.gperf  */
-/* Computed positions: -k'' */
-
-#line 3 "/Users/Ragna/Documents/Appcelerator_Studio_Workspace/macaddress/android/build/generated/KrollGeneratedBindings.gperf"
-
-
-#include <string.h>
-#include <v8.h>
+/**
+ * Axway Appcelerator Titanium Mobile
+ * Copyright (c) 2017 by Axway. All Rights Reserved.
+ * Licensed under the terms of the Apache Public License
+ * Please see the LICENSE included with this distribution for details.
+ *
+ * Warning: This file is GENERATED, and should not be modified
+ */
+#include <unordered_map>
 #include <KrollBindings.h>
 
 #include "com.ibilis.macaddress.ExampleProxy.h"
@@ -14,66 +14,54 @@
 
 
 namespace titanium {
-namespace bindings {
-#line 16 "/Users/Ragna/Documents/Appcelerator_Studio_Workspace/macaddress/android/build/generated/KrollGeneratedBindings.gperf"
-struct BindEntry;
-/* maximum key range = 5, duplicates = 0 */
+	namespace bindings {
 
-class MacaddressBindings
-{
-private:
-  static inline unsigned int hash (const char *str, unsigned int len);
-public:
-  static struct BindEntry *lookupGeneratedInit (const char *str, unsigned int len);
-};
+		struct BindEntry;
+		
+		struct Hash {
+			// FNV-1a hashing algorithm
+			// http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-1a
+			std::size_t operator()(const char* name) const {
+				std::size_t length = strlen(name);
+				std::size_t hash = 0x811C9DC5;
+				for (std::size_t i = 0; i < length; ++i) {
+					hash ^= name[i];
+					hash += (hash << 24) + (hash << 8) + (hash << 7) + (hash << 4) + (hash << 1);
+				}
+				return hash;
+			}
+		};
 
-inline /*ARGSUSED*/
-unsigned int
-MacaddressBindings::hash (register const char *str, register unsigned int len)
-{
-  return len;
-}
+		struct Compare {
+			bool operator()(const char* a, const char* b) const {
+				return !strcmp(a, b);
+			}
+		};
 
-struct BindEntry *
-MacaddressBindings::lookupGeneratedInit (register const char *str, register unsigned int len)
-{
-  enum
-    {
-      TOTAL_KEYWORDS = 2,
-      MIN_WORD_LENGTH = 34,
-      MAX_WORD_LENGTH = 38,
-      MIN_HASH_VALUE = 34,
-      MAX_HASH_VALUE = 38
-    };
+		class MacaddressBindings {
+			public:
+				static BindEntry* lookupGeneratedInit(const char*, unsigned int);
+		};
 
-  static struct BindEntry wordlist[] =
-    {
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
-#line 19 "/Users/Ragna/Documents/Appcelerator_Studio_Workspace/macaddress/android/build/generated/KrollGeneratedBindings.gperf"
-      {"com.ibilis.macaddress.ExampleProxy",::com::ibilis::macaddress::macaddress::ExampleProxy::bindProxy,::com::ibilis::macaddress::macaddress::ExampleProxy::dispose},
-      {""}, {""}, {""},
-#line 18 "/Users/Ragna/Documents/Appcelerator_Studio_Workspace/macaddress/android/build/generated/KrollGeneratedBindings.gperf"
-      {"com.ibilis.macaddress.MacaddressModule",::com::ibilis::macaddress::MacaddressModule::bindProxy,::com::ibilis::macaddress::MacaddressModule::dispose}
-    };
+		BindEntry* MacaddressBindings::lookupGeneratedInit(const char* name, unsigned int length) {
+			static BindEntry binds[] = {
+				{"com.ibilis.macaddress.MacaddressModule", ::com::ibilis::macaddress::MacaddressModule::bindProxy, ::com::ibilis::macaddress::MacaddressModule::dispose},
+				{"com.ibilis.macaddress.ExampleProxy", ::com::ibilis::macaddress::macaddress::ExampleProxy::bindProxy, ::com::ibilis::macaddress::macaddress::ExampleProxy::dispose}
+			};
+			static std::unordered_map<const char*, BindEntry&, Hash, Compare> map = {
+				{binds[0].name, binds[0]},
+				{binds[1].name, binds[1]},
+			};
 
-  if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
-    {
-      unsigned int key = hash (str, len);
-
-      if (key <= MAX_HASH_VALUE)
-        {
-          register const char *s = wordlist[key].name;
-
-          if (*str == *s && !strcmp (str + 1, s + 1))
-            return &wordlist[key];
-        }
-    }
-  return 0;
-}
-#line 20 "/Users/Ragna/Documents/Appcelerator_Studio_Workspace/macaddress/android/build/generated/KrollGeneratedBindings.gperf"
-
-}
+			auto result = map.find(name);
+			while (result != map.end()) {
+				// fallback in case of very unlikely collision
+				if (!strcmp(name, result->second.name)) {
+					return &result->second;
+				}
+				result++;
+			}
+			return nullptr;
+		}
+	}
 }

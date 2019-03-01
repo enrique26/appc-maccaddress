@@ -1,6 +1,6 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2011-2016 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2011-2017 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -10,11 +10,8 @@
 #include "com.ibilis.macaddress.MacaddressModule.h"
 
 #include "AndroidUtil.h"
-#include "EventEmitter.h"
 #include "JNIUtil.h"
 #include "JSException.h"
-#include "Proxy.h"
-#include "ProxyFactory.h"
 #include "TypeConverter.h"
 #include "V8Util.h"
 
@@ -36,7 +33,7 @@ namespace macaddress {
 Persistent<FunctionTemplate> MacaddressModule::proxyTemplate;
 jclass MacaddressModule::javaClass = NULL;
 
-MacaddressModule::MacaddressModule(jobject javaObject) : titanium::Proxy(javaObject)
+MacaddressModule::MacaddressModule() : titanium::Proxy()
 {
 }
 
@@ -45,9 +42,22 @@ void MacaddressModule::bindProxy(Local<Object> exports, Local<Context> context)
 	Isolate* isolate = context->GetIsolate();
 
 	Local<FunctionTemplate> pt = getProxyTemplate(isolate);
-	Local<Function> proxyConstructor = pt->GetFunction(context).ToLocalChecked();
+
+	v8::TryCatch tryCatch(isolate);
+	Local<Function> constructor;
+	MaybeLocal<Function> maybeConstructor = pt->GetFunction(context);
+	if (!maybeConstructor.ToLocal(&constructor)) {
+		titanium::V8Util::fatalException(isolate, tryCatch);
+		return;
+	}
+
 	Local<String> nameSymbol = NEW_SYMBOL(isolate, "Macaddress"); // use symbol over string for efficiency
-	Local<Object> moduleInstance = proxyConstructor->NewInstance(context).ToLocalChecked();
+	MaybeLocal<Object> maybeInstance = constructor->NewInstance(context);
+	Local<Object> moduleInstance;
+	if (!maybeInstance.ToLocal(&moduleInstance)) {
+		titanium::V8Util::fatalException(isolate, tryCatch);
+		return;
+	}
 	exports->Set(nameSymbol, moduleInstance);
 }
 
@@ -67,7 +77,7 @@ Local<FunctionTemplate> MacaddressModule::getProxyTemplate(Isolate* isolate)
 		return proxyTemplate.Get(isolate);
 	}
 
-	LOGD(TAG, "GetProxyTemplate");
+	LOGD(TAG, "MacaddressModule::getProxyTemplate()");
 
 	javaClass = titanium::JNIUtil::findClass("com/ibilis/macaddress/MacaddressModule");
 	EscapableHandleScope scope(isolate);
@@ -81,9 +91,7 @@ Local<FunctionTemplate> MacaddressModule::getProxyTemplate(Isolate* isolate)
 
 	proxyTemplate.Reset(isolate, t);
 	t->Set(titanium::Proxy::inheritSymbol.Get(isolate),
-		FunctionTemplate::New(isolate, titanium::Proxy::inherit<MacaddressModule>)->GetFunction());
-
-	titanium::ProxyFactory::registerProxyPair(javaClass, *t);
+		FunctionTemplate::New(isolate, titanium::Proxy::inherit<MacaddressModule>));
 
 	// Method bindings --------------------------------------------------------
 	titanium::SetProtoMethod(isolate, t, "getMacAddr", MacaddressModule::getMacAddr);
@@ -140,18 +148,20 @@ void MacaddressModule::getMacAddr(const FunctionCallbackInfo<Value>& args)
 		holder = holder->FindInstanceInPrototypeChain(getProxyTemplate(isolate));
 	}
 
-	titanium::Proxy* proxy = titanium::Proxy::unwrap(holder);
+	titanium::Proxy* proxy = NativeObject::Unwrap<titanium::Proxy>(holder);
 
 	jvalue* jArguments = 0;
 
 	jobject javaProxy = proxy->getJavaObject();
+	if (javaProxy == NULL) {
+		args.GetReturnValue().Set(v8::Undefined(isolate));
+		return;
+	}
 	jstring jResult = (jstring)env->CallObjectMethodA(javaProxy, methodID, jArguments);
 
 
 
-	if (!JavaObject::useGlobalRefs) {
-		env->DeleteLocalRef(javaProxy);
-	}
+	proxy->unreferenceJavaObject(javaProxy);
 
 
 
@@ -202,18 +212,20 @@ void MacaddressModule::example(const FunctionCallbackInfo<Value>& args)
 		holder = holder->FindInstanceInPrototypeChain(getProxyTemplate(isolate));
 	}
 
-	titanium::Proxy* proxy = titanium::Proxy::unwrap(holder);
+	titanium::Proxy* proxy = NativeObject::Unwrap<titanium::Proxy>(holder);
 
 	jvalue* jArguments = 0;
 
 	jobject javaProxy = proxy->getJavaObject();
+	if (javaProxy == NULL) {
+		args.GetReturnValue().Set(v8::Undefined(isolate));
+		return;
+	}
 	jstring jResult = (jstring)env->CallObjectMethodA(javaProxy, methodID, jArguments);
 
 
 
-	if (!JavaObject::useGlobalRefs) {
-		env->DeleteLocalRef(javaProxy);
-	}
+	proxy->unreferenceJavaObject(javaProxy);
 
 
 
@@ -260,7 +272,7 @@ void MacaddressModule::getter_exampleProp(Local<Name> property, const PropertyCa
 		}
 	}
 
-	titanium::Proxy* proxy = titanium::Proxy::unwrap(args.Holder());
+	titanium::Proxy* proxy = NativeObject::Unwrap<titanium::Proxy>(args.Holder());
 
 	if (!proxy) {
 		args.GetReturnValue().Set(Undefined(isolate));
@@ -270,13 +282,15 @@ void MacaddressModule::getter_exampleProp(Local<Name> property, const PropertyCa
 	jvalue* jArguments = 0;
 
 	jobject javaProxy = proxy->getJavaObject();
+	if (javaProxy == NULL) {
+		args.GetReturnValue().Set(v8::Undefined(isolate));
+		return;
+	}
 	jstring jResult = (jstring)env->CallObjectMethodA(javaProxy, methodID, jArguments);
 
 
 
-	if (!JavaObject::useGlobalRefs) {
-		env->DeleteLocalRef(javaProxy);
-	}
+	proxy->unreferenceJavaObject(javaProxy);
 
 
 
@@ -320,7 +334,7 @@ void MacaddressModule::setter_exampleProp(Local<Name> property, Local<Value> val
 		}
 	}
 
-	titanium::Proxy* proxy = titanium::Proxy::unwrap(args.Holder());
+	titanium::Proxy* proxy = NativeObject::Unwrap<titanium::Proxy>(args.Holder());
 	if (!proxy) {
 		return;
 	}
@@ -340,11 +354,12 @@ void MacaddressModule::setter_exampleProp(Local<Name> property, Local<Value> val
 	}
 
 	jobject javaProxy = proxy->getJavaObject();
+	if (javaProxy == NULL) {
+		return;
+	}
 	env->CallVoidMethodA(javaProxy, methodID, jArguments);
 
-	if (!JavaObject::useGlobalRefs) {
-		env->DeleteLocalRef(javaProxy);
-	}
+	proxy->unreferenceJavaObject(javaProxy);
 
 
 
